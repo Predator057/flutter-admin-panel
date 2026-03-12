@@ -1,0 +1,200 @@
+import 'package:admin_service/colors.dart';
+import 'package:admin_service/providers/config_provider.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+class ConfigSetScreen extends ConsumerStatefulWidget {
+  const ConfigSetScreen({super.key});
+
+  @override
+  ConfigSetScreenState createState() => ConfigSetScreenState();
+}
+
+class ConfigSetScreenState extends ConsumerState<ConfigSetScreen> {
+  String? season;
+  @override
+  Widget build(BuildContext context) {
+    var provider = ref.watch(configScreenProvider);
+    return Expanded(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Container(
+            height: 100,
+            alignment: Alignment.center,
+            padding: EdgeInsets.all(10),
+            color: actveColor,
+            child: Text(
+              "Конфигурация",
+              style: TextStyle(
+                fontSize: 36,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          SizedBox(height: 10),
+          Container(
+            width: 500,
+            height: 400,
+            alignment: Alignment.center,
+            child: Column(
+              children: [
+                ConfigRow(
+                  title: "ip адресс робота:",
+                  label: provider.ipRobot,
+                  onSubmited: (s) {
+                    ref.read(configScreenProvider.notifier).setIpRobot(s);
+                  },
+                ),
+                Container(
+                  height: 45,
+                  color: const Color.fromARGB(113, 0, 0, 0),
+                  alignment: Alignment.center,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      SizedBox(
+                        width: 170,
+                        height: 40,
+                        child: Container(
+                          alignment: Alignment.center,
+                          color: cellColor,
+                          child: Text("порт робота", style: _headerStyle),
+                        ),
+                      ),
+                      SizedBox(width: 10),
+                      SizedBox(
+                        width: 170,
+                        height: 40,
+                        child: Container(
+                          alignment: Alignment.center,
+                          color: cellColor,
+                          child: TextField(
+                            inputFormatters: [
+                              FilteringTextInputFormatter
+                                  .digitsOnly, // Только цифры 0-9
+                            ],
+                            decoration: InputDecoration(
+                              filled: true,
+                              focusColor: Colors.white,
+                              labelText: provider.portRobot.toString(),
+                              border: OutlineInputBorder(),
+                            ),
+                            onSubmitted: (value) {
+                              if (value != "") {
+                                ref
+                                    .read(configScreenProvider.notifier)
+                                    .setPortRobot(int.parse(value));
+                              }
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                ConfigRow(
+                  title: "ip адресс ККТ:",
+                  label: provider.ipKKT,
+                  onSubmited: (s) {
+                    ref.read(configScreenProvider.notifier).setIpKKT(s);
+                  },
+                ),
+                SizedBox(height: 10),
+                Button(content: "Сохранить", onClick: () {}),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ConfigRow extends ConsumerStatefulWidget {
+  final String title;
+  final String label;
+  final void Function(String) onSubmited;
+  const ConfigRow({
+    super.key,
+    required this.title,
+    required this.label,
+    required this.onSubmited,
+  });
+
+  @override
+  ConfigRowState createState() => ConfigRowState();
+}
+
+class ConfigRowState extends ConsumerState<ConfigRow> {
+  @override
+  Widget build(BuildContext context) {
+    return (Container(
+      height: 45,
+      color: const Color.fromARGB(113, 0, 0, 0),
+      alignment: Alignment.center,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          SizedBox(
+            width: 170,
+            height: 40,
+            child: Container(
+              alignment: Alignment.center,
+              color: cellColor,
+              child: Text(widget.title, style: _headerStyle),
+            ),
+          ),
+          SizedBox(width: 10),
+          SizedBox(
+            width: 170,
+            height: 40,
+            child: Container(
+              alignment: Alignment.center,
+              color: cellColor,
+              child: TextField(
+                decoration: InputDecoration(
+                  filled: true,
+                  focusColor: Colors.white,
+                  labelText: widget.label,
+                  border: OutlineInputBorder(),
+                ),
+                onSubmitted: (value) {
+                  if (value != "") {
+                    widget.onSubmited(value);
+                  }
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    ));
+  }
+}
+
+class Button extends StatelessWidget {
+  final String content;
+  final VoidCallback onClick;
+  const Button({super.key, required this.content, required this.onClick});
+
+  @override
+  Widget build(BuildContext context) {
+    return (Container(
+      width: 170,
+      padding: EdgeInsets.all(5),
+      decoration: BoxDecoration(
+        color: buttonGreen,
+        border: Border.all(color: Colors.white38),
+      ),
+      child: TextButton(
+        onPressed: () => onClick(),
+        child: Text(content, style: _headerStyle),
+      ),
+    ));
+  }
+}
+
+TextStyle _headerStyle = TextStyle(fontSize: 16, color: Colors.white);
