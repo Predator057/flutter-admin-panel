@@ -1,16 +1,17 @@
 import 'package:admin_service/colors.dart';
+import 'package:admin_service/providers/config_provider.dart';
 import 'package:admin_service/providers/recource_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class LeftTabs extends StatefulWidget {
+class LeftTabs extends ConsumerStatefulWidget {
   const LeftTabs({super.key});
 
   @override
   LeftTabsState createState() => LeftTabsState();
 }
 
-class LeftTabsState extends State<LeftTabs> {
+class LeftTabsState extends ConsumerState<LeftTabs> {
   @override
   Widget build(BuildContext context) {
     return (SizedBox(
@@ -43,14 +44,14 @@ class LeftTabsState extends State<LeftTabs> {
   }
 }
 
-class RadioTabButton extends StatefulWidget {
+class RadioTabButton extends ConsumerStatefulWidget {
   const RadioTabButton({super.key});
 
   @override
   RadioTabButtonState createState() => RadioTabButtonState();
 }
 
-class RadioTabButtonState extends State<RadioTabButton> {
+class RadioTabButtonState extends ConsumerState<RadioTabButton> {
   int group = 0;
   @override
   Widget build(BuildContext context) {
@@ -126,6 +127,7 @@ class RadioTabButtonState extends State<RadioTabButton> {
           group,
           onClick: (id) {
             group = id;
+            ref.read(configScreenProvider.notifier).loadConfig();
             setState(() {});
           },
         ),

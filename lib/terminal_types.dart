@@ -70,16 +70,37 @@ class Transaction {
   };
 }
 
-class ConfigWithoutPass {
+class Config {
   final String ipRobot;
   final int portRobot;
-  final String ipKKT;
-  ConfigWithoutPass(this.ipRobot, this.portRobot, this.ipKKT);
+  final String addrFr;
+  final String currentSeason;
+  final String tokenOfd;
+  final String portBill;
+  final String currentOfd;
+  final String notifierText;
+  final int timeoutScreenSaver;
+  Config(this.ipRobot, this.portRobot, this.addrFr, this.currentSeason, this.tokenOfd, this.portBill, this.currentOfd, this.notifierText, this.timeoutScreenSaver);
 
   Map<String, dynamic> toJson() => {
-    'ip_robot': ipRobot,
+    'ipv4_robot': ipRobot,
     'port_robot': portRobot,
-    'ip_kkt': ipKKT,
+    'addr_fr': addrFr,
+    'current_season': currentSeason,
+    'token_ofd': tokenOfd,
+    'port_bill': portBill,
+    'current_ofd': currentOfd,
+    'notifier_text': notifierText,
+    'screen_saver_timeout': timeoutScreenSaver,
+  };
+}
+class Authorization {
+  final String hash;
+  final String login;
+  Authorization(this.hash, this.login);
+  Map<String, dynamic> toJson() =>{
+    'hash': hash,
+    'login': login,
   };
 }
 

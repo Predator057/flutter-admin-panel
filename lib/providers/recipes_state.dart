@@ -21,7 +21,10 @@ class RecipesNotifier extends StateNotifier<RecipesState> {
   RecipesNotifier() : super(const RecipesState());
   void initDB() async {
     try {
-      var response = await http.get(Uri.http('$ipback:3030', '/api/recipe'));
+      var response = await http.get(Uri.http('$ipback:3030', '/api/recipe'),
+        headers: {
+        'Authorization': 'Bearer $apiToken',
+      },);
       if (response.statusCode == 200) {
         print("инициализируем рецепты");
       }
@@ -34,6 +37,9 @@ class RecipesNotifier extends StateNotifier<RecipesState> {
     try {
       var response = await http.get(
         Uri.http('$ipback:3030', '/api/get/recipes/$season'),
+        headers: {
+          'Authorization': 'Bearer $apiToken',
+        },
       );
       if (response.statusCode == 200) {
         print("Получены $season рецепты  ${response.body}");
@@ -67,6 +73,9 @@ class RecipesNotifier extends StateNotifier<RecipesState> {
     try {
       var response = await http.patch(
         Uri.http('$ipback:3030', '/api/config/patch/season=$season'),
+        headers: {
+          'Authorization': 'Bearer $apiToken',
+        },
       );
       print("сохраним = ${jsonEncode(state.recipes)}");
       if (response.statusCode == 200) {
@@ -197,7 +206,7 @@ class RecipesNotifier extends StateNotifier<RecipesState> {
     try {
       var response = await http.put(
         Uri.http('$ipback:3030', '/api/put/recipes/confirm'),
-        headers: {'Content-Type': 'application/json'},
+        headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer $apiToken',},
         body: jsonEncode(state.recipes),
       );
       print("сохраним = ${jsonEncode(state.recipes)}");

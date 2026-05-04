@@ -1,4 +1,5 @@
 import 'package:admin_service/colors.dart';
+import 'package:admin_service/providers/api_client.dart';
 import 'package:admin_service/providers/config_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,10 +13,12 @@ class ConfigSetScreen extends ConsumerStatefulWidget {
 }
 
 class ConfigSetScreenState extends ConsumerState<ConfigSetScreen> {
-  String? season;
+
+  String currOfd = "";
   @override
   Widget build(BuildContext context) {
     var provider = ref.watch(configScreenProvider);
+    currOfd = provider.currentOfd;
     return Expanded(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -36,8 +39,6 @@ class ConfigSetScreenState extends ConsumerState<ConfigSetScreen> {
           ),
           SizedBox(height: 10),
           Container(
-            width: 500,
-            height: 400,
             alignment: Alignment.center,
             child: Column(
               children: [
@@ -56,7 +57,7 @@ class ConfigSetScreenState extends ConsumerState<ConfigSetScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       SizedBox(
-                        width: 170,
+                        width: 220,
                         height: 40,
                         child: Container(
                           alignment: Alignment.center,
@@ -65,8 +66,8 @@ class ConfigSetScreenState extends ConsumerState<ConfigSetScreen> {
                         ),
                       ),
                       SizedBox(width: 10),
+                  Flexible(child:
                       SizedBox(
-                        width: 170,
                         height: 40,
                         child: Container(
                           alignment: Alignment.center,
@@ -91,19 +92,89 @@ class ConfigSetScreenState extends ConsumerState<ConfigSetScreen> {
                             },
                           ),
                         ),
-                      ),
+                      )),
                     ],
                   ),
                 ),
                 ConfigRow(
-                  title: "ip адресс ККТ:",
-                  label: provider.ipKKT,
+                  title: "ip адресс:порт ФР:",
+                  label: provider.addrFr,
                   onSubmited: (s) {
                     ref.read(configScreenProvider.notifier).setIpKKT(s);
                   },
                 ),
+                ConfigRow(
+                  title: "token API OFD:",
+                  label: provider.tokenOfd,
+                  onSubmited: (s) {
+                    ref.read(configScreenProvider.notifier).setIpRobot(s);
+                  },
+                ),
+                ConfigRow(
+                  title: "Порт купюроприемника:",
+                  label: provider.portBill,
+                  onSubmited: (s) {
+                    ref.read(configScreenProvider.notifier).setPortBill(s);
+                  },
+                ),
+                ConfigRow(
+                  title: "Таймаут скринсейвера",
+                  label: provider.timeoutScreenSaver.toString(),
+                  onSubmited: (s) {
+                    ref.read(configScreenProvider.notifier).setTimeoutScreenSaver(int.parse(s));
+                  },
+                ),
+                ConfigRow(
+                  title: "Текст уведомление",
+                  label: provider.notifierText,
+                  onSubmited: (s) {
+                    ref.read(configScreenProvider.notifier).setTextNotifier(s);
+                  },
+                ),
+                RadioGroup<String>(
+                  onChanged: (s) {
+                    if (s != null) {
+                      print("выбрали сезон $s");
+                      ref.read(configScreenProvider.notifier).setCurrentOfd(s);
+                    }
+                  },
+                  groupValue: currOfd,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("Ваш ОФД: ", style: _style),
+                      SizedBox(
+                        height: 50,
+                        width: 260,
+                        child: ListTile(
+                          title: Text(r"ООО 'Ярус'", style: _style),
+                          leading: Radio<String>(
+                            activeColor: Colors.amber,
+                            toggleable: true,
+                            value: "ООО 'Ярус'",
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(
+                        height: 50,
+                        width: 200,
+                        child: ListTile(
+                          title: Text(r"Такском", style: _style),
+                          leading: Radio<String>(
+                            activeColor: Colors.amber,
+                            toggleable: true,
+                            value: "Такском",
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                 SizedBox(height: 10),
-                Button(content: "Сохранить", onClick: () {}),
+                Button(content: "Сохранить", onClick: () {
+                  ref.read(configScreenProvider.notifier).saveChanged();
+                }),
               ],
             ),
           ),
@@ -139,7 +210,7 @@ class ConfigRowState extends ConsumerState<ConfigRow> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           SizedBox(
-            width: 170,
+            width: 220,
             height: 40,
             child: Container(
               alignment: Alignment.center,
@@ -148,10 +219,9 @@ class ConfigRowState extends ConsumerState<ConfigRow> {
             ),
           ),
           SizedBox(width: 10),
-          SizedBox(
-            width: 170,
+          Flexible(child: SizedBox(
             height: 40,
-            child: Container(
+            child: Flexible(child:  Container(
               alignment: Alignment.center,
               color: cellColor,
               child: TextField(
@@ -167,8 +237,8 @@ class ConfigRowState extends ConsumerState<ConfigRow> {
                   }
                 },
               ),
-            ),
-          ),
+            )),
+          ),)
         ],
       ),
     ));
@@ -198,3 +268,4 @@ class Button extends StatelessWidget {
 }
 
 TextStyle _headerStyle = TextStyle(fontSize: 16, color: Colors.white);
+TextStyle _style = TextStyle(fontSize: 26, color: Colors.white);

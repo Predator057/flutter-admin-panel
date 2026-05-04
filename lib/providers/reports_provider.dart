@@ -39,6 +39,9 @@ class ReportsNotifier extends StateNotifier<ReportsState> {
     try {
       var response = await http.get(
         Uri.http('$ipback:3030', '/api/get/transactions'),
+        headers: {
+          'Authorization': 'Bearer $apiToken',
+        },
       );
       if (response.statusCode == 200) {
         print("Получены транзакции ${response.body}");
@@ -81,6 +84,9 @@ class ReportsNotifier extends StateNotifier<ReportsState> {
     try {
       var response = await http.get(
         Uri.http('$ipback:3030', '/api/transactions/count'),
+        headers: {
+          'Authorization': 'Bearer $apiToken',
+        },
       );
       int count = int.parse(response.body);
       state = state.copyWith(count: count);
@@ -91,6 +97,9 @@ class ReportsNotifier extends StateNotifier<ReportsState> {
     try {
       var response = await http.post(
         Uri.http('$ipback:3030', '/api/post/transactions/add'),
+        headers: {
+          'Authorization': 'Bearer $apiToken',
+        },
         body: jsonEncode(t),
       );
       if (response.statusCode == 200) {}

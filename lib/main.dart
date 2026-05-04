@@ -69,7 +69,7 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
                       border: OutlineInputBorder(),
                     ),
                     onSubmitted: (value) async {
-                      ref.read(configProvider.notifier).verifyHash(value);
+                      ref.read(configProvider.notifier).verifyHash(value.trim());
                     },
                   ),
                 ),

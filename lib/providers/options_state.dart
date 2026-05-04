@@ -22,7 +22,10 @@ class OptionsNotifier extends StateNotifier<OptionsState> {
   OptionsNotifier() : super(const OptionsState());
   void initDB() async {
     try {
-      var response = await http.get(Uri.http('$ipback:3030', '/api/option'));
+      var response = await http.get(Uri.http('$ipback:3030', '/api/option'),
+        headers: {
+        'Authorization': 'Bearer $apiToken',
+      },);
       if (response.statusCode == 200) {
         print("инициализируем опции");
       }
@@ -55,7 +58,9 @@ class OptionsNotifier extends StateNotifier<OptionsState> {
     try {
       var response = await http.put(
         Uri.http('$ipback:3030', '/api/put/options/confirm'),
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $apiToken',},
         body: jsonEncode(state.options),
       );
       print("сохраним = ${jsonEncode(state.options)}");
@@ -73,6 +78,9 @@ class OptionsNotifier extends StateNotifier<OptionsState> {
     try {
       var response = await http.get(
         Uri.http('$ipback:3030', '/api/get/options'),
+        headers: {
+          'Authorization': 'Bearer $apiToken',
+        },
       );
       if (response.statusCode == 200) {
         print("Получены опции ${response.body}");

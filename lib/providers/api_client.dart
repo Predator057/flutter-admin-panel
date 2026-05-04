@@ -5,12 +5,14 @@ import 'package:http/http.dart' as http;
 import 'package:bcrypt/bcrypt.dart';
 
 class ConfigState {
+  final String ipTerm;
   final String base64Screen;
   final String ipRobot;
   final int portRobot;
   final String season;
   final bool verify;
   const ConfigState({
+    this.ipTerm = "192.168.0.2",
     this.base64Screen = '',
     this.ipRobot = "192.168.9.3",
     this.portRobot = 3001,
@@ -19,6 +21,7 @@ class ConfigState {
   });
 
   ConfigState copyWith({
+    String? ipTerm,
     String? base64Screen,
     String? ipRobot,
     int? portRobot,
@@ -26,6 +29,7 @@ class ConfigState {
     bool? verify,
   }) {
     return ConfigState(
+      ipTerm: ipTerm ?? this.ipTerm,
       ipRobot: ipRobot ?? this.ipRobot,
       portRobot: portRobot ?? this.portRobot,
       season: season ?? this.season,
@@ -42,6 +46,9 @@ class ConfigNotifier extends StateNotifier<ConfigState> {
     try {
       var response = await http.get(
         Uri.http('$ipback:3030', '/api/get/config'),
+        headers: {
+          'Authorization': 'Bearer $apiToken',
+        },
       );
       if (response.statusCode == 200) {
         print("инициализируем config");
@@ -54,10 +61,19 @@ class ConfigNotifier extends StateNotifier<ConfigState> {
     }
   }
 
+
+  void setIpTerm(String ip) {
+    state = state.copyWith(ipTerm: ip);
+  }
+
+
   void setSeason(String season) async {
     try {
       var response = await http.patch(
         Uri.http('$ipback:3030', '/api/config/patch/season=$season'),
+        headers: {
+          'Authorization': 'Bearer $apiToken',
+        },
       );
       if (response.statusCode == 200) {
         state = state.copyWith(season: season);
@@ -74,6 +90,9 @@ class ConfigNotifier extends StateNotifier<ConfigState> {
     try {
       var response = await http.get(
         Uri.http('$ipback:3030', '/api/config/get/season'),
+        headers: {
+        'Authorization': 'Bearer $apiToken',
+      },
       );
       if (response.statusCode == 200) {
         state = state.copyWith(season: response.body);
@@ -89,6 +108,9 @@ class ConfigNotifier extends StateNotifier<ConfigState> {
     try {
       var response = await http.get(
         Uri.http('$ipback:3030', '/api/GET/screenshot'),
+        headers: {
+          'Authorization': 'Bearer $apiToken',
+        },
       );
       if (response.statusCode == 200) {
         print("Получен скриншот терминала");
@@ -104,10 +126,13 @@ class ConfigNotifier extends StateNotifier<ConfigState> {
     try {
       var response = await http.get(
         Uri.http('$ipback:3030', '/api/config/GET/hash'),
+        headers: {
+          'Authorization': 'Bearer $apiToken',
+        },
       );
       if (response.statusCode == 200) {
         print("Получен хеш");
-        String hashed = response.body;
+        String hashed = response.body.trim();
         state = state.copyWith(verify: BCrypt.checkpw(text, hashed));
       }
     } catch (e) {

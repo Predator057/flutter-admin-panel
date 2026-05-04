@@ -153,7 +153,7 @@ class TransactionRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return (Container(
-      height: 45,
+      height: 70,
       color: cellColor,
       alignment: Alignment.center,
       child: Row(
@@ -202,7 +202,7 @@ class TransactionRow extends StatelessWidget {
           Container(
             alignment: Alignment.center,
             width: 200,
-            height: 40,
+            height: 60,
             color: cellColor,
             child: Text(transaction.dateTimeStart.toString(), style: _style),
           ),
