@@ -1,18 +1,17 @@
 import 'package:admin_service/colors.dart';
-import 'package:admin_service/providers/api_client.dart';
 import 'package:admin_service/providers/config_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ConfigSetScreen extends ConsumerStatefulWidget {
-  const ConfigSetScreen({super.key});
+class FiscalScreen extends ConsumerStatefulWidget {
+  const FiscalScreen({super.key});
 
   @override
-  ConfigSetScreenState createState() => ConfigSetScreenState();
+  FiscalScreenState createState() => FiscalScreenState();
 }
 
-class ConfigSetScreenState extends ConsumerState<ConfigSetScreen> {
+class FiscalScreenState extends ConsumerState<FiscalScreen> {
   String currOfd = "";
   @override
   Widget build(BuildContext context) {
@@ -28,7 +27,7 @@ class ConfigSetScreenState extends ConsumerState<ConfigSetScreen> {
             padding: EdgeInsets.all(10),
             color: actveColor,
             child: Text(
-              "Конфигурация",
+              "Ручное проведение чеков ОФД 1.05",
               style: TextStyle(
                 fontSize: 36,
                 color: Colors.white,
@@ -42,7 +41,7 @@ class ConfigSetScreenState extends ConsumerState<ConfigSetScreen> {
             child: Column(
               children: [
                 ConfigRow(
-                  title: "ip адресс робота:",
+                  title: "Номер моечной программы",
                   label: provider.ipRobot,
                   onSubmited: (s) {
                     ref.read(configScreenProvider.notifier).setIpRobot(s);

@@ -6,6 +6,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+// const List<Operation> _OPERATIONS = [
+//   Operation('Мойка', 1, 0, 0),
+//   Operation('Мойка x3 К', 2, 0, 0),
+//   Operation('Мойка x3 Б', 3, 0, 0),
+//   Operation('Мойка x3 КБ', 4, 0, 0),
+//   Operation('Москитная', 5, 0, 0),
+//   Operation('Моющее А', 6, 0, 0),
+//   Operation('Моющее А x3 Б', 7, 0, 0),
+//   Operation('Моющее А x3 КБ', 8, 0, 0),
+//   Operation('Моющее А 1/2', 9, 0, 0),
+//   Operation('Моющее B', 10, 0, 0),
+//   Operation('Моющее B x3 Б', 11, 0, 0),
+//   Operation('Моющее B x3 КБ', 12, 0, 0),
+//   Operation('Моющее B 1/2', 13, 0, 0),
+//   Operation('Пена', 15, 0, 0),
+//   Operation('Пена x3 Б', 16, 0, 0),
+//   Operation('Воск', 17, 0, 0),
+//   Operation('Осмос', 18, 0, 0),
+//   Operation('Воск + Осмос', 19, 0, 0),
+//   Operation('Обдув', 20, 0, 0),
+// ];
 const List<Operation> _OPERATIONS = [
   Operation('Мойка', 1, 0, 0),
   Operation('Мойка x3 К', 2, 0, 0),
