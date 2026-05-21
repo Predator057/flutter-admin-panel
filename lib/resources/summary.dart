@@ -25,8 +25,8 @@ class SummaryState extends ConsumerState<Summary> {
   @override
   void initState() {
     super.initState();
-    //_startTimer();
-    ref.read(configProvider.notifier).updateScreen();
+    ref.read(configProvider.notifier).startTimerPeriodic(3000);
+    ref.read(configProvider.notifier).getBestRecipe();
     ref.read(reportsProvider.notifier).getTransactions();
   }
 
@@ -45,7 +45,8 @@ class SummaryState extends ConsumerState<Summary> {
 
   @override
   Widget build(BuildContext context) {
-    String base = ref.watch(configProvider).base64Screen;
+    int best = ref.watch(configProvider.select((st) => st.bestId));
+    String base = ref.watch(configProvider.select((st) => st.base64Screen));
     int count = ref.read(reportsProvider.notifier).getToDayTrs().length;
     return (Expanded(
       child: SingleChildScrollView(
@@ -80,17 +81,101 @@ class SummaryState extends ConsumerState<Summary> {
               ],
             ),
             Container(
-              color: const Color.fromARGB(36, 182, 208, 212),
+              color: const Color.fromARGB(34, 42, 131, 145),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  Container(width: 300, child: Column(children: [
-                      ],
-                    )),
                   Column(
                     children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Container(
+                            width: 250,
+                            padding: EdgeInsets.all(10),
+                            color: actveColor,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "Сегодня моек",
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                Text(
+                                  count.toString(),
+                                  style: TextStyle(
+                                    fontSize: 52,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(width: 20),
+                          Container(
+                            padding: EdgeInsets.all(10),
+                            width: 300,
+                            color: actveColor,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "Чаще выбирают",
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                Text(
+                                  ref.read(configProvider).bestId == 0
+                                      ? "нет данных"
+                                      : ref
+                                            .read(configProvider)
+                                            .bestId
+                                            .toString(),
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(width: 20),
+                          Container(
+                            padding: EdgeInsets.all(10),
+                            width: 250,
+                            color: actveColor,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "Сумма за сегодня",
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                Text(
+                                  "${ref.read(reportsProvider.notifier).getSumToday()}₽",
+                                  style: TextStyle(
+                                    fontSize: 52,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                       Text(
-                        """Экран терминала (обновляется каждые 10 секунд):
-Последнее обновление: ${_normalFormat(DateTime.now().hour)}:${_normalFormat(DateTime.now().minute)}:${_normalFormat(DateTime.now().second)}""",
+                        """Экран терминала: Последнее обновление: ${_normalFormat(DateTime.now().hour)}:${_normalFormat(DateTime.now().minute)}:${_normalFormat(DateTime.now().second)}""",
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 20,
@@ -111,79 +196,6 @@ class SummaryState extends ConsumerState<Summary> {
             ),
 
             SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Container(
-                  width: 250,
-                  padding: EdgeInsets.all(10),
-                  color: actveColor,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "Сегодня моек",
-                        style: TextStyle(fontSize: 24, color: Colors.white),
-                      ),
-                      Text(
-                        count.toString(),
-                        style: TextStyle(
-                          fontSize: 52,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(width: 20),
-                Container(
-                  padding: EdgeInsets.all(10),
-                  width: 300,
-                  color: actveColor,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "Чаще выбирают",
-                        style: TextStyle(fontSize: 24, color: Colors.white),
-                      ),
-                      Text(
-                        "бесплатная",
-                        style: TextStyle(
-                          fontSize: 24,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(width: 20),
-                Container(
-                  padding: EdgeInsets.all(10),
-                  width: 250,
-                  color: actveColor,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "Сумма за сегодня",
-                        style: TextStyle(fontSize: 24, color: Colors.white),
-                      ),
-                      Text(
-                        "${ref.read(reportsProvider.notifier).getSumToday()}₽",
-                        style: TextStyle(
-                          fontSize: 52,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
           ],
         ),
       ),

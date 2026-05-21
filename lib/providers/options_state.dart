@@ -1,3 +1,5 @@
+import 'package:admin_service/providers/api_client.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:admin_service/terminal_types.dart';
 import 'package:admin_service/ipadress.dart';
@@ -19,13 +21,15 @@ class OptionsState {
 }
 
 class OptionsNotifier extends StateNotifier<OptionsState> {
-  OptionsNotifier() : super(const OptionsState());
+  final Ref ref;
+  OptionsNotifier(this.ref) : super(const OptionsState());
   void initDB() async {
+    String ipback = ref.read(configProvider).ipTerm;
     try {
-      var response = await http.get(Uri.http('$ipback:3030', '/api/option'),
-        headers: {
-        'Authorization': 'Bearer $apiToken',
-      },);
+      var response = await http.get(
+        Uri.http('$ipback:3030', '/api/option'),
+        headers: {'Authorization': 'Bearer $apiToken'},
+      );
       if (response.statusCode == 200) {
         print("инициализируем опции");
       }
@@ -56,11 +60,13 @@ class OptionsNotifier extends StateNotifier<OptionsState> {
 
   void saveState() async {
     try {
+      String ipback = ref.read(configProvider).ipTerm;
       var response = await http.put(
         Uri.http('$ipback:3030', '/api/put/options/confirm'),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $apiToken',},
+          'Authorization': 'Bearer $apiToken',
+        },
         body: jsonEncode(state.options),
       );
       print("сохраним = ${jsonEncode(state.options)}");
@@ -76,11 +82,10 @@ class OptionsNotifier extends StateNotifier<OptionsState> {
 
   void getOptions() async {
     try {
+      String ipback = ref.read(configProvider).ipTerm;
       var response = await http.get(
         Uri.http('$ipback:3030', '/api/get/options'),
-        headers: {
-          'Authorization': 'Bearer $apiToken',
-        },
+        headers: {'Authorization': 'Bearer $apiToken'},
       );
       if (response.statusCode == 200) {
         print("Получены опции ${response.body}");
@@ -109,5 +114,5 @@ class OptionsNotifier extends StateNotifier<OptionsState> {
 }
 
 final optionsProvider = StateNotifierProvider<OptionsNotifier, OptionsState>(
-  (ref) => OptionsNotifier(),
+  (ref) => OptionsNotifier(ref),
 );

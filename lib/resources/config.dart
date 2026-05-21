@@ -1,5 +1,4 @@
 import 'package:admin_service/colors.dart';
-import 'package:admin_service/providers/api_client.dart';
 import 'package:admin_service/providers/config_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -118,7 +117,7 @@ class ConfigSetScreenState extends ConsumerState<ConfigSetScreen> {
                   },
                 ),
                 ConfigRow(
-                  title: "Таймаут скринсейвера",
+                  title: "Таймаут скринсейвера:",
                   label: provider.timeoutScreenSaver.toString(),
                   onSubmited: (s) {
                     ref
@@ -127,10 +126,31 @@ class ConfigSetScreenState extends ConsumerState<ConfigSetScreen> {
                   },
                 ),
                 ConfigRow(
-                  title: "Текст уведомление",
+                  title: "Текст уведомление:",
                   label: provider.notifierText,
                   onSubmited: (s) {
                     ref.read(configScreenProvider.notifier).setTextNotifier(s);
+                  },
+                ),
+                ConfigRow(
+                  title: "Текст вызова оператора:",
+                  label: provider.textAdmin,
+                  onSubmited: (s) {
+                    ref.read(configScreenProvider.notifier).setTextAdmin(s);
+                  },
+                ),
+                ConfigRow(
+                  title: "Время начала раб. дня:",
+                  label: provider.timeBeginDay,
+                  onSubmited: (s) {
+                    ref.read(configScreenProvider.notifier).setTimeBeginDay(s);
+                  },
+                ),
+                ConfigRow(
+                  title: "Время окончания раб. дня:",
+                  label: provider.timeEndDay,
+                  onSubmited: (s) {
+                    ref.read(configScreenProvider.notifier).setTimeEndDay(s);
                   },
                 ),
                 RadioGroup<String>(
@@ -207,7 +227,7 @@ class ConfigRow extends ConsumerStatefulWidget {
 class ConfigRowState extends ConsumerState<ConfigRow> {
   @override
   Widget build(BuildContext context) {
-    return (Container(
+    return Container(
       height: 45,
       color: const Color.fromARGB(113, 0, 0, 0),
       alignment: Alignment.center,
@@ -223,34 +243,32 @@ class ConfigRowState extends ConsumerState<ConfigRow> {
               child: Text(widget.title, style: _headerStyle),
             ),
           ),
-          SizedBox(width: 10),
+          const SizedBox(width: 10),
           Flexible(
             child: SizedBox(
               height: 40,
-              child: Flexible(
-                child: Container(
-                  alignment: Alignment.center,
-                  color: cellColor,
-                  child: TextField(
-                    decoration: InputDecoration(
-                      filled: true,
-                      focusColor: Colors.white,
-                      labelText: widget.label,
-                      border: OutlineInputBorder(),
-                    ),
-                    onSubmitted: (value) {
-                      if (value != "") {
-                        widget.onSubmited(value);
-                      }
-                    },
+              child: Container(
+                alignment: Alignment.center,
+                color: cellColor,
+                child: TextField(
+                  decoration: InputDecoration(
+                    filled: true,
+                    focusColor: Colors.white,
+                    labelText: widget.label,
+                    border: OutlineInputBorder(),
                   ),
+                  onSubmitted: (value) {
+                    if (value.isNotEmpty) {
+                      widget.onSubmited(value);
+                    }
+                  },
                 ),
               ),
             ),
           ),
         ],
       ),
-    ));
+    );
   }
 }
 

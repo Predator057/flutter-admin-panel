@@ -1,3 +1,5 @@
+import 'package:admin_service/providers/api_client.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:admin_service/terminal_types.dart';
 import 'package:admin_service/ipadress.dart';
@@ -34,14 +36,14 @@ class ReportsState {
 }
 
 class ReportsNotifier extends StateNotifier<ReportsState> {
-  ReportsNotifier() : super(const ReportsState());
+  final Ref ref;
+  ReportsNotifier(this.ref) : super(const ReportsState());
   void getTransactions() async {
+    String ipback = ref.read(configProvider).ipTerm;
     try {
       var response = await http.get(
         Uri.http('$ipback:3030', '/api/get/transactions'),
-        headers: {
-          'Authorization': 'Bearer $apiToken',
-        },
+        headers: {'Authorization': 'Bearer $apiToken'},
       );
       if (response.statusCode == 200) {
         print("Получены транзакции ${response.body}");
@@ -54,6 +56,7 @@ class ReportsNotifier extends StateNotifier<ReportsState> {
               newTransactions.add(
                 Transaction(
                   t["id"] as int? ?? 0,
+                  t["id_r"] as int? ?? 0,
                   t["nr"] as String? ?? '',
                   _toOptionFromId(t["pro"]),
                   t["drt"] as int? ?? 0,
@@ -82,11 +85,10 @@ class ReportsNotifier extends StateNotifier<ReportsState> {
 
   void getCountTransaction() async {
     try {
+      String ipback = ref.read(configProvider).ipTerm;
       var response = await http.get(
         Uri.http('$ipback:3030', '/api/transactions/count'),
-        headers: {
-          'Authorization': 'Bearer $apiToken',
-        },
+        headers: {'Authorization': 'Bearer $apiToken'},
       );
       int count = int.parse(response.body);
       state = state.copyWith(count: count);
@@ -95,11 +97,10 @@ class ReportsNotifier extends StateNotifier<ReportsState> {
 
   void addTransaction(Transaction t) async {
     try {
+      String ipback = ref.read(configProvider).ipTerm;
       var response = await http.post(
         Uri.http('$ipback:3030', '/api/post/transactions/add'),
-        headers: {
-          'Authorization': 'Bearer $apiToken',
-        },
+        headers: {'Authorization': 'Bearer $apiToken'},
         body: jsonEncode(t),
       );
       if (response.statusCode == 200) {}
@@ -186,5 +187,5 @@ class ReportsNotifier extends StateNotifier<ReportsState> {
 }
 
 final reportsProvider = StateNotifierProvider<ReportsNotifier, ReportsState>(
-  (ref) => ReportsNotifier(),
+  (ref) => ReportsNotifier(ref),
 );

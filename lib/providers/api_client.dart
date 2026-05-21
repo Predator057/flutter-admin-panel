@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:admin_service/ipadress.dart';
 import 'package:riverpod/legacy.dart';
@@ -11,6 +12,7 @@ class ConfigState {
   final int portRobot;
   final String season;
   final bool verify;
+  final int bestId;
   const ConfigState({
     this.ipTerm = "192.168.0.2",
     this.base64Screen = '',
@@ -18,6 +20,7 @@ class ConfigState {
     this.portRobot = 3001,
     this.season = "",
     this.verify = false,
+    this.bestId = 0,
   });
 
   ConfigState copyWith({
@@ -27,6 +30,7 @@ class ConfigState {
     int? portRobot,
     String? season,
     bool? verify,
+    int? bestId,
   }) {
     return ConfigState(
       ipTerm: ipTerm ?? this.ipTerm,
@@ -35,6 +39,7 @@ class ConfigState {
       season: season ?? this.season,
       base64Screen: base64Screen ?? this.base64Screen,
       verify: verify ?? this.verify,
+      bestId: bestId ?? this.bestId,
     );
   }
 }
@@ -45,10 +50,8 @@ class ConfigNotifier extends StateNotifier<ConfigState> {
   void loadConfig() async {
     try {
       var response = await http.get(
-        Uri.http('$ipback:3030', '/api/get/config'),
-        headers: {
-          'Authorization': 'Bearer $apiToken',
-        },
+        Uri.http('${state.ipTerm}:3030', '/api/get/config'),
+        headers: {'Authorization': 'Bearer $apiToken'},
       );
       if (response.statusCode == 200) {
         print("инициализируем config");
@@ -61,19 +64,15 @@ class ConfigNotifier extends StateNotifier<ConfigState> {
     }
   }
 
-
   void setIpTerm(String ip) {
     state = state.copyWith(ipTerm: ip);
   }
 
-
   void setSeason(String season) async {
     try {
       var response = await http.patch(
-        Uri.http('$ipback:3030', '/api/config/patch/season=$season'),
-        headers: {
-          'Authorization': 'Bearer $apiToken',
-        },
+        Uri.http('${state.ipTerm}:3030', '/api/config/patch/season=$season'),
+        headers: {'Authorization': 'Bearer $apiToken'},
       );
       if (response.statusCode == 200) {
         state = state.copyWith(season: season);
@@ -89,10 +88,8 @@ class ConfigNotifier extends StateNotifier<ConfigState> {
   void getSeason() async {
     try {
       var response = await http.get(
-        Uri.http('$ipback:3030', '/api/config/get/season'),
-        headers: {
-        'Authorization': 'Bearer $apiToken',
-      },
+        Uri.http('${state.ipTerm}:3030', '/api/config/get/season'),
+        headers: {'Authorization': 'Bearer $apiToken'},
       );
       if (response.statusCode == 200) {
         state = state.copyWith(season: response.body);
@@ -104,13 +101,11 @@ class ConfigNotifier extends StateNotifier<ConfigState> {
     }
   }
 
-  void updateScreen() async {
+  Future<void> updateScreen() async {
     try {
       var response = await http.get(
-        Uri.http('$ipback:3030', '/api/GET/screenshot'),
-        headers: {
-          'Authorization': 'Bearer $apiToken',
-        },
+        Uri.http('${state.ipTerm}:3030', '/api/GET/screenshot'),
+        headers: {'Authorization': 'Bearer $apiToken'},
       );
       if (response.statusCode == 200) {
         print("Получен скриншот терминала");
@@ -125,10 +120,8 @@ class ConfigNotifier extends StateNotifier<ConfigState> {
   void verifyHash(String text) async {
     try {
       var response = await http.get(
-        Uri.http('$ipback:3030', '/api/config/GET/hash'),
-        headers: {
-          'Authorization': 'Bearer $apiToken',
-        },
+        Uri.http('${state.ipTerm}:3030', '/api/config/GET/hash'),
+        headers: {'Authorization': 'Bearer $apiToken'},
       );
       if (response.statusCode == 200) {
         print("Получен хеш");
@@ -138,6 +131,30 @@ class ConfigNotifier extends StateNotifier<ConfigState> {
     } catch (e) {
       print("Ошибка получения хеша: $e");
     }
+  }
+
+  Future<void> getBestRecipe() async {
+    try {
+      var response = await http.get(
+        Uri.http('${state.ipTerm}:3030', '/api/transactions/best_recipe'),
+        headers: {'Authorization': 'Bearer $apiToken'},
+      );
+      if (response.statusCode == 200) {
+        print("Получен хеш");
+        state = state.copyWith(bestId: int.parse(response.body));
+      }
+    } catch (e) {
+      state = state.copyWith(bestId: 0);
+      print("Ошибка получения хеша: $e");
+    }
+  }
+
+  Timer? _timer;
+
+  void startTimerPeriodic(int seconds) {
+    _timer ??= Timer.periodic(Duration(milliseconds: seconds), (timer) async {
+      await updateScreen();
+    });
   }
 }
 

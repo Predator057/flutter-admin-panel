@@ -22,61 +22,76 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage("assets/images/background.jpg"),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: Expanded(
-          child: Container(
-            alignment: Alignment.center,
-            decoration: BoxDecoration(color: actveColor),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "uid терминала:",
-                  style: TextStyle(color: Colors.black, fontSize: 24),
-                ),
-
-                SizedBox(
-                  width: 250,
-                  height: 40,
-                  child: TextField(
-                    decoration: InputDecoration(
-                      filled: true,
-                      focusColor: Colors.white,
-                      labelText: 'логин',
-                      border: OutlineInputBorder(),
-                    ),
-                    onSubmitted: (value) {},
-                  ),
-                ),
-                Text(
-                  "Пароль:",
-                  style: TextStyle(color: Colors.black, fontSize: 24),
-                ),
-                SizedBox(
-                  width: 250,
-                  height: 40,
-                  child: TextField(
-                    decoration: InputDecoration(
-                      filled: true,
-                      focusColor: Colors.white,
-                      labelText: 'пароль',
-                      border: OutlineInputBorder(),
-                    ),
-                    onSubmitted: (value) async {
-                      ref.read(configProvider.notifier).verifyHash(value.trim());
-                    },
-                  ),
-                ),
-              ],
+      body: Stack(
+        children: [
+          // Фон
+          Positioned.fill(
+            child: Image.asset(
+              "assets/images/background.jpg",
+              fit: BoxFit.cover,
             ),
           ),
-        ),
+          // Контент по центру
+          Center(
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: actveColor,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    "uid терминала:",
+                    style: TextStyle(color: Colors.black, fontSize: 24),
+                  ),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    width: 250,
+                    height: 40,
+                    child: TextField(
+                      decoration: InputDecoration(
+                        filled: true,
+                        focusColor: Colors.white,
+                        labelText: 'логин',
+                        border: OutlineInputBorder(),
+                      ),
+                      onChanged: (value) {
+                        ref.read(configProvider.notifier).setIpTerm(value);
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    "Пароль:",
+                    style: TextStyle(color: Colors.black, fontSize: 24),
+                  ),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    width: 250,
+                    height: 40,
+                    child: TextField(
+                      obscureText: true, // ← рекомендую добавить для пароля
+                      decoration: InputDecoration(
+                        filled: true,
+                        focusColor: Colors.white,
+                        labelText: 'пароль',
+                        border: OutlineInputBorder(),
+                      ),
+                      onSubmitted: (value) async {
+                        ref
+                            .read(configProvider.notifier)
+                            .verifyHash(value.trim());
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

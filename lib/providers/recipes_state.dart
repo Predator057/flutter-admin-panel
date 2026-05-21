@@ -1,3 +1,5 @@
+import 'package:admin_service/providers/api_client.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:admin_service/terminal_types.dart';
 import 'package:admin_service/ipadress.dart';
@@ -18,13 +20,15 @@ class RecipesState {
 }
 
 class RecipesNotifier extends StateNotifier<RecipesState> {
-  RecipesNotifier() : super(const RecipesState());
+  final Ref ref;
+  RecipesNotifier(this.ref) : super(const RecipesState());
   void initDB() async {
+    String ipback = ref.read(configProvider).ipTerm;
     try {
-      var response = await http.get(Uri.http('$ipback:3030', '/api/recipe'),
-        headers: {
-        'Authorization': 'Bearer $apiToken',
-      },);
+      var response = await http.get(
+        Uri.http('$ipback:3030', '/api/recipe'),
+        headers: {'Authorization': 'Bearer $apiToken'},
+      );
       if (response.statusCode == 200) {
         print("инициализируем рецепты");
       }
@@ -35,11 +39,10 @@ class RecipesNotifier extends StateNotifier<RecipesState> {
 
   void getRecipes(String season) async {
     try {
+      String ipback = ref.read(configProvider).ipTerm;
       var response = await http.get(
         Uri.http('$ipback:3030', '/api/get/recipes/$season'),
-        headers: {
-          'Authorization': 'Bearer $apiToken',
-        },
+        headers: {'Authorization': 'Bearer $apiToken'},
       );
       if (response.statusCode == 200) {
         print("Получены $season рецепты  ${response.body}");
@@ -71,11 +74,10 @@ class RecipesNotifier extends StateNotifier<RecipesState> {
 
   void setSeason(String season) async {
     try {
+      String ipback = ref.read(configProvider).ipTerm;
       var response = await http.patch(
         Uri.http('$ipback:3030', '/api/config/patch/season=$season'),
-        headers: {
-          'Authorization': 'Bearer $apiToken',
-        },
+        headers: {'Authorization': 'Bearer $apiToken'},
       );
       print("сохраним = ${jsonEncode(state.recipes)}");
       if (response.statusCode == 200) {
@@ -204,9 +206,13 @@ class RecipesNotifier extends StateNotifier<RecipesState> {
 
   void saveState() async {
     try {
+      String ipback = ref.read(configProvider).ipTerm;
       var response = await http.put(
         Uri.http('$ipback:3030', '/api/put/recipes/confirm'),
-        headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer $apiToken',},
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $apiToken',
+        },
         body: jsonEncode(state.recipes),
       );
       print("сохраним = ${jsonEncode(state.recipes)}");
@@ -253,5 +259,5 @@ class RecipesNotifier extends StateNotifier<RecipesState> {
 }
 
 final recipesProvider = StateNotifierProvider<RecipesNotifier, RecipesState>(
-  (ref) => RecipesNotifier(),
+  (ref) => RecipesNotifier(ref),
 );

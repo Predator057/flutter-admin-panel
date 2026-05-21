@@ -44,6 +44,7 @@ class Option {
 
 class Transaction {
   final int id;
+  final int idRecipe;
   final String nameRecipe;
   final List<String> paramsOption;
   final int duration;
@@ -52,6 +53,7 @@ class Transaction {
   final String dateTimeEnd;
   const Transaction(
     this.id,
+    this.idRecipe,
     this.nameRecipe,
     this.paramsOption,
     this.duration,
@@ -61,6 +63,7 @@ class Transaction {
   );
   Map<String, dynamic> toJson() => {
     'id': id,
+    'id_r': idRecipe,
     'nr': nameRecipe,
     'pro': paramsOption,
     'drt': duration,
@@ -80,7 +83,25 @@ class Config {
   final String currentOfd;
   final String notifierText;
   final int timeoutScreenSaver;
-  Config(this.ipRobot, this.portRobot, this.addrFr, this.currentSeason, this.tokenOfd, this.portBill, this.currentOfd, this.notifierText, this.timeoutScreenSaver);
+  final String timeLastSession;
+  final String timeEndDay;
+  final String timeBeginDay;
+  final String textAdmin;
+  Config(
+    this.ipRobot,
+    this.portRobot,
+    this.addrFr,
+    this.currentSeason,
+    this.tokenOfd,
+    this.portBill,
+    this.currentOfd,
+    this.notifierText,
+    this.timeoutScreenSaver,
+    this.timeLastSession,
+    this.timeEndDay,
+    this.timeBeginDay,
+    this.textAdmin,
+  );
 
   Map<String, dynamic> toJson() => {
     'ipv4_robot': ipRobot,
@@ -92,16 +113,18 @@ class Config {
     'current_ofd': currentOfd,
     'notifier_text': notifierText,
     'screen_saver_timeout': timeoutScreenSaver,
+    'date_time_last_open_session': timeLastSession,
+    'time_end_day': timeEndDay,
+    'time_begin_day': timeBeginDay,
+    'text_admin': textAdmin,
   };
 }
+
 class Authorization {
   final String hash;
   final String login;
   Authorization(this.hash, this.login);
-  Map<String, dynamic> toJson() =>{
-    'hash': hash,
-    'login': login,
-  };
+  Map<String, dynamic> toJson() => {'hash': hash, 'login': login};
 }
 
 enum Seasons { summer, winter }

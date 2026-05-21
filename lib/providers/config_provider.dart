@@ -1,9 +1,11 @@
+import 'package:admin_service/providers/api_client.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:admin_service/terminal_types.dart';
 import 'package:admin_service/ipadress.dart';
 import 'package:riverpod/legacy.dart';
 import 'dart:convert';
-
 
 class ConfigScrState {
   final String ipRobot;
@@ -15,6 +17,10 @@ class ConfigScrState {
   final String currentSeason;
   final String notifierText;
   final int timeoutScreenSaver;
+  final String timeLastSession;
+  final String timeEndDay;
+  final String timeBeginDay;
+  final String textAdmin;
   const ConfigScrState({
     this.ipRobot = "192.168.9.3",
     this.portRobot = 3001,
@@ -25,9 +31,14 @@ class ConfigScrState {
     this.currentSeason = '',
     this.notifierText = '',
     this.timeoutScreenSaver = 600,
+    this.timeLastSession = '',
+    this.timeEndDay = '',
+    this.timeBeginDay = '',
+    this.textAdmin = '',
   });
 
-  ConfigScrState copyWith({String? ipRobot,
+  ConfigScrState copyWith({
+    String? ipRobot,
     int? portRobot,
     String? addrFr,
     String? tokenOfd,
@@ -35,7 +46,12 @@ class ConfigScrState {
     String? currentOfd,
     String? notifierText,
     int? timeoutScreenSaver,
-  String? currentSeason,}) {
+    String? currentSeason,
+    String? timeLastSession,
+    String? timeEndDay,
+    String? timeBeginDay,
+    String? textAdmin,
+  }) {
     return ConfigScrState(
       ipRobot: ipRobot ?? this.ipRobot,
       portRobot: portRobot ?? this.portRobot,
@@ -46,20 +62,25 @@ class ConfigScrState {
       currentSeason: currentSeason ?? this.currentSeason,
       notifierText: notifierText ?? this.notifierText,
       timeoutScreenSaver: timeoutScreenSaver ?? this.timeoutScreenSaver,
+      timeLastSession: timeLastSession ?? this.timeLastSession,
+      timeEndDay: timeEndDay ?? this.timeEndDay,
+      timeBeginDay: timeBeginDay ?? this.timeBeginDay,
+      textAdmin: textAdmin ?? this.textAdmin,
     );
   }
 }
 
 class ConfigScrNotifier extends StateNotifier<ConfigScrState> {
-  ConfigScrNotifier() : super(const ConfigScrState());
+  final Ref ref;
+
+  ConfigScrNotifier(this.ref) : super(const ConfigScrState());
 
   void loadConfig() async {
+    String ipback = ref.read(configProvider).ipTerm;
     try {
       var response = await http.get(
         Uri.http('$ipback:3030', '/api/config/GET'),
-        headers: {
-          'Authorization': 'Bearer $apiToken',
-        },
+        headers: {'Authorization': 'Bearer $apiToken'},
       );
       if (response.statusCode == 200) {
         print("получен конфиг");
@@ -73,6 +94,11 @@ class ConfigScrNotifier extends StateNotifier<ConfigScrState> {
           portBill: jsonData["port_bill"] as String? ?? '',
           notifierText: jsonData["notifier_text"] as String? ?? '',
           timeoutScreenSaver: jsonData["screen_saver_timeout"] as int? ?? 600,
+          timeLastSession:
+              jsonData["date_time_last_open_session"] as String? ?? '',
+          timeEndDay: jsonData["time_end_day"] as String? ?? '',
+          timeBeginDay: jsonData["time_begin_day"] as String? ?? '',
+          textAdmin: jsonData["text_admin"] as String? ?? '',
         );
       }
     } catch (e) {
@@ -83,30 +109,50 @@ class ConfigScrNotifier extends StateNotifier<ConfigScrState> {
   void setIpRobot(String ip) {
     state = state.copyWith(ipRobot: ip);
   }
+
   void setIpKKT(String ip) {
     state = state.copyWith(addrFr: ip);
   }
+
   void setPortRobot(int port) {
     state = state.copyWith(portRobot: port);
   }
-  void setPortBill(String port){
+
+  void setPortBill(String port) {
     state = state.copyWith(portBill: port);
   }
+
   void setAddrFr(String addr) {
     state = state.copyWith(addrFr: addr);
   }
+
   void setCurrentOfd(String ofd) {
     state = state.copyWith(currentOfd: ofd);
   }
+
   void setTextNotifier(String text) {
     state = state.copyWith(notifierText: text);
   }
-  void setTimeoutScreenSaver(int timeout){
+
+  void setTimeoutScreenSaver(int timeout) {
     state = state.copyWith(timeoutScreenSaver: timeout);
   }
 
+  void setTimeEndDay(String time) {
+    //Должны получить время в формате HH:MM
+    state = state.copyWith(timeEndDay: time);
+  }
+
+  void setTimeBeginDay(String time) {
+    state = state.copyWith(timeBeginDay: time);
+  }
+
+  void setTextAdmin(String text) {
+    state = state.copyWith(textAdmin: text);
+  }
 
   void saveChanged() async {
+    String ipback = ref.read(configProvider).ipTerm;
     Config config = Config(
       state.ipRobot,
       state.portRobot,
@@ -117,6 +163,10 @@ class ConfigScrNotifier extends StateNotifier<ConfigScrState> {
       state.currentOfd,
       state.notifierText,
       state.timeoutScreenSaver,
+      state.timeLastSession,
+      state.timeEndDay,
+      state.timeBeginDay,
+      state.textAdmin,
     );
     try {
       print("Сохраним конфиг");
@@ -133,9 +183,7 @@ class ConfigScrNotifier extends StateNotifier<ConfigScrState> {
       if (response.statusCode == 200) {
         var saveResponse = await http.put(
           Uri.http('$ipback:3030', '/api/config/PUT/save'),
-          headers: {
-            'Authorization': 'Bearer $apiToken',
-          },
+          headers: {'Authorization': 'Bearer $apiToken'},
         );
         if (saveResponse.statusCode == 200) {
           print('успешно сохранено');
@@ -149,5 +197,5 @@ class ConfigScrNotifier extends StateNotifier<ConfigScrState> {
 
 final configScreenProvider =
     StateNotifierProvider<ConfigScrNotifier, ConfigScrState>(
-      (ref) => ConfigScrNotifier(),
+      (ref) => ConfigScrNotifier(ref),
     );
