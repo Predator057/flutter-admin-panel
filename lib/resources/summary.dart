@@ -25,7 +25,7 @@ class SummaryState extends ConsumerState<Summary> {
   @override
   void initState() {
     super.initState();
-    ref.read(configProvider.notifier).startTimerPeriodic(3000);
+    ref.read(configProvider.notifier).startTimerPeriodic(1000);
     ref.read(configProvider.notifier).getBestRecipe();
     ref.read(reportsProvider.notifier).getTransactions();
   }
